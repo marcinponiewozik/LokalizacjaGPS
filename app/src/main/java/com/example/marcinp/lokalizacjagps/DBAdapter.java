@@ -103,6 +103,14 @@ public class DBAdapter extends SQLiteOpenHelper {
         sql.close();
     }
 
+    public Cursor wezWyniki(int id){
+        SQLiteDatabase sql = getReadableDatabase();
+        String[] kolumny = {"id","id_TRASA","czas"};
+        String[] argumenty = {""+id};
+        Cursor c = sql.query("WYNIK",kolumny,"id_TRASA=?",argumenty,null,null,null);
+        return c;
+    }
+
     public void dodajWspolrzedne(Wspolrzedne wsp){
         SQLiteDatabase sql = getWritableDatabase();
         ContentValues cv= new ContentValues();
@@ -119,11 +127,12 @@ public class DBAdapter extends SQLiteOpenHelper {
         sql.close();
     }
 
-    public Cursor getAllWspolrzedne(){
+    public Cursor wezWSPOLRZEDNE(int id){
         SQLiteDatabase sql = getReadableDatabase();
-        String[] kolumny = {"id","id_TRASA","dlugosc","szerokosc"};
-        Cursor c = sql.query("WSPOLRZEDNE",kolumny,null,null,null,null,null);
-        return  c;
+        String[] kolumny = {"dlugosc","szerokosc"};
+        String[] argumenty = {""+id};
+        Cursor c = sql.query("WSPOLRZEDNE",kolumny,"id_TRASA=?",argumenty,null,null,null);
+        return c;
     }
 
 }
