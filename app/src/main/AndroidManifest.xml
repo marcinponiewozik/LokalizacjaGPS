@@ -37,6 +37,7 @@
         <activity android:name=".ActivityClass.Biegnij"/>
         <activity android:name=".ActivityClass.Trasy"/>
         <activity android:name=".ActivityClass.Wyniki"/>
+        <activity android:name=".ActivityClass.TrasyMapa"/>
     </application>
 
 </manifest>

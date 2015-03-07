@@ -122,7 +122,7 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
 
             }
         };
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000,10, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000,5, locationListener);
     }
     public void ustawAdapterSpinnera(){
         DBAdapter sql = new DBAdapter(context);
