@@ -1,24 +1,27 @@
 package com.example.marcinp.lokalizacjagps.KlasyJava;
 
 /**
- * Created by MarcinP on 2015-03-03.
+ * Created by Marcin on 2015-03-07.
  */
-public class Wynik {
-    int id;
-    int id_Trasa;
+public class Czas {
     int godziny;
     int minuty;
     int sekundy;
 
+    public String czasSlownie(){
+        if( godziny == 0){
+            return  minuty +" min "+sekundy+" sek";
+        }
+        else
+            return  godziny+" godz "+minuty +" min "+sekundy+" sek";
+    }
+    public Czas() {
+    }
 
-    public Wynik(int id_Trasa, int godziny, int minuty, int sekundy) {
-        this.id_Trasa = id_Trasa;
+    public Czas(int godziny, int minuty, int sekundy) {
         this.godziny = godziny;
         this.minuty = minuty;
         this.sekundy = sekundy;
-    }
-
-    public Wynik() {
     }
 
     public int getGodziny() {
@@ -43,22 +46,5 @@ public class Wynik {
 
     public void setSekundy(int sekundy) {
         this.sekundy = sekundy;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
-    public int getId_Trasa() {
-        return id_Trasa;
-    }
-
-    public void setId_Trasa(int id_Trasa) {
-        this.id_Trasa = id_Trasa;
     }
 }

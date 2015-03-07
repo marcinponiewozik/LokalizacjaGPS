@@ -32,7 +32,9 @@ public class DBAdapter extends SQLiteOpenHelper {
                 "CREATE Table WYNIK(" +
                         "id INTEGER PRIMARY KEY Autoincrement," +
                         "id_TRASA INTEGER," +
-                        "czas DOUBLE," +
+                        "godziny INTEGER," +
+                        "minuty INTEGER," +
+                        "sekundy INTEGER," +
                         "FOREIGN KEY(id_TRASA) REFERENCES TRASA(id)" +
                         ");" +
                         "");
@@ -92,7 +94,9 @@ public class DBAdapter extends SQLiteOpenHelper {
         SQLiteDatabase sql = getWritableDatabase();
         ContentValues cv= new ContentValues();
         cv.put("id_Trasa",wynik.getId_Trasa());
-        cv.put("czas",wynik.getCzas());
+        cv.put("godziny",wynik.getGodziny());
+        cv.put("minuty",wynik.getMinuty());
+        cv.put("sekundy",wynik.getSekundy());
         sql.insert("WYNIK", null, cv);
         sql.close();
     }
@@ -105,7 +109,7 @@ public class DBAdapter extends SQLiteOpenHelper {
 
     public Cursor wezWyniki(int id){
         SQLiteDatabase sql = getReadableDatabase();
-        String[] kolumny = {"id","id_TRASA","czas"};
+        String[] kolumny = {"id","id_TRASA","godziny","minuty","sekundy"};
         String[] argumenty = {""+id};
         Cursor c = sql.query("WYNIK",kolumny,"id_TRASA=?",argumenty,null,null,null);
         return c;

@@ -174,10 +174,10 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
 
                         int sekundy = (int) (czasUpdated / 1000);
                         int minuty = sekundy/60;
-
+                        int godziny = minuty/60;
                         sekundy = sekundy % 60;
 
-                        tvTimer.setText(minuty+":"+
+                        tvTimer.setText(godziny+":"+minuty+":"+
                                 String.format("%02d", sekundy));
                     }
                 });
@@ -217,8 +217,8 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
     public void btnStop(View v){
         stopTimer();
 
-        nowy.zakonczBieg(0, context);
-        //tvLogi.setText(tvLogi.getText().toString()+nowy.getWspolrzednesList().size());
+        nowy.zakonczBieg(czasUpdated, context);
+
         locationManager.removeUpdates(locationListener);
     }
 }

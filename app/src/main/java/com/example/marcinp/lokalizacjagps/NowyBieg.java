@@ -4,8 +4,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
 
+import com.example.marcinp.lokalizacjagps.KlasyJava.Czas;
 import com.example.marcinp.lokalizacjagps.KlasyJava.Trasa;
 import com.example.marcinp.lokalizacjagps.KlasyJava.Wspolrzedne;
+import com.example.marcinp.lokalizacjagps.KlasyJava.Wynik;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,6 @@ public class NowyBieg {
     Trasa trasa;
     List<Wspolrzedne> wspolrzednesList;
     boolean porazPierwszy;
-    double czas;
 
     public NowyBieg() {
         wspolrzednesList = new ArrayList<Wspolrzedne>();
@@ -36,39 +37,36 @@ public class NowyBieg {
         wspolrzednesList.add(temp);
     }
 
-    public void zakonczBieg(double czas,Context context){
-        this.czas = czas;
-//        sprawdzTrase(trasa.getId(),context);
-//        if (porazPierwszy){
-            DBAdapter sql = new DBAdapter(context);
-            for (int i = 0; i <wspolrzednesList.size() ; i++) {
-                sql.dodajWspolrzedne(wspolrzednesList.get(i));
+    public void zakonczBieg(Long czas,Context context){
 
+        int sekundy = (int) (czas/1000);
+        int minuty = sekundy/60;
+        int godziny = minuty/60;
+        DBAdapter sql = new DBAdapter(context);
+        sprawdzTrase(trasa.getId(),context);
+        if(porazPierwszy){
+            for (int i = 0; i < wspolrzednesList.size(); i++) {
+                sql.dodajWspolrzedne(wspolrzednesList.get(i));
             }
-        //}
+        }
+
+        Wynik wynik = new Wynik();
+        wynik.setId_Trasa(trasa.getId());
+        wynik.setGodziny(godziny);
+        wynik.setMinuty(minuty);
+        wynik.setSekundy(sekundy);
+        sql.dodajWynik(wynik);
 
     }
 
     public void sprawdzTrase(int id,Context context){
         DBAdapter sql = new DBAdapter(context);
-        Cursor c =sql.getAllTrasy();
-        while (c.moveToNext())
-        {
-            if(id == c.getInt(0))
-            {
-                porazPierwszy = false;
-                break;
-            }
-        }
+        Cursor c =sql.wezWyniki(id);
+        if(c.getCount()!=0)
+            porazPierwszy= false;
     }
 
-    public double getCzas() {
-        return czas;
-    }
 
-    public void setCzas(double czas) {
-        this.czas = czas;
-    }
 
     public Trasa getTrasa() {
         return trasa;
