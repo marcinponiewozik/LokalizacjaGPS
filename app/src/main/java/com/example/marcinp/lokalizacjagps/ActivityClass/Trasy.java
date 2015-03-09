@@ -46,7 +46,7 @@ public class Trasy extends Activity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
 
                 DBAdapter sql = new DBAdapter(context);
-                aktualnaTrasa=sql.wezTrase( adapterView.getItemAtPosition(pos).toString());
+                aktualnaTrasa=sql.wezTrasePoNazwie( adapterView.getItemAtPosition(pos).toString());
                 tvNazwaTrasy.setText("Wyniki dla trasy:" + aktualnaTrasa.getNazwa());
                 initListView(aktualnaTrasa);
             }

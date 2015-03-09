@@ -1,13 +1,16 @@
 package com.example.marcinp.lokalizacjagps.ActivityClass;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import com.example.marcinp.lokalizacjagps.ActivityClass.Biegnij;
+import com.example.marcinp.lokalizacjagps.DBAdapter;
 import com.example.marcinp.lokalizacjagps.KlasyJava.Trasa;
+import com.example.marcinp.lokalizacjagps.KlasyJava.Wspolrzedne;
 import com.example.marcinp.lokalizacjagps.R;
 
 /**
@@ -15,11 +18,23 @@ import com.example.marcinp.lokalizacjagps.R;
  */
 public class Menu extends Activity {
     private Button btnBiegnij,btnTrasy,btnWyniki;
+    Context context = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.menu);
 
+//        DBAdapter sql = new DBAdapter(context);
+//        Wspolrzedne wspolrzedne = new Wspolrzedne();
+//
+//        Double a=22.222;
+//        Double b=51.222;
+//        for (int i = 0; i <30 ; i++) {
+//            wspolrzedne.setId_Trasa(1);
+//            wspolrzedne.setDlugosc(a+i);
+//            wspolrzedne.setSzerokosc(b+i);
+//            sql.dodajWspolrzedne(wspolrzedne);
+//        }
         initUi();
     }
 

@@ -26,6 +26,7 @@ import com.example.marcinp.lokalizacjagps.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +89,7 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
         spnTrasy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                aktualnaTrasa = sql.wezTrase(listaTras.get(position));
+                aktualnaTrasa = sql.wezTrasePoNazwie(listaTras.get(position));
                 aktualizujUI(aktualnaTrasa);
             }
             @Override
@@ -104,7 +105,7 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
             @Override
             public void onLocationChanged(Location location) {
                 nowy.dodajWspolrzedne(location);
-                tvLogi.setText(tvLogi.getText().toString()+location.getLongitude()+"||"+location.getLatitude()+"\n");
+                tvLogi.setText(tvLogi.getText().toString()+location.getLatitude()+"||"+location.getLongitude()+"\n");
             }
 
             @Override

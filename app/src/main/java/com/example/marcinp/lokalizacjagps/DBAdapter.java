@@ -70,7 +70,21 @@ public class DBAdapter extends SQLiteOpenHelper {
         sql.close();
     }
 
-    public Trasa wezTrase(String nazwa){
+    public Trasa wezTrase(int id){
+        SQLiteDatabase sql = getReadableDatabase();
+        String[] kolumny = {"id","nazwa","dystans"};
+        String[] argumenty = {""+id};
+        Cursor c = sql.query("TRASA",kolumny,"id=?",argumenty,null,null,null);
+        Trasa trasa = new Trasa();
+        while (c.moveToNext()){
+            trasa.setId(c.getInt(0));
+            trasa.setNazwa(c.getString(1));
+            trasa.setDystans(c.getDouble(2));
+        }
+        return trasa;
+    }
+
+    public Trasa wezTrasePoNazwie(String nazwa){
         SQLiteDatabase sql = getReadableDatabase();
         String[] kolumny = {"id","nazwa","dystans"};
         String[] argumenty = {""+nazwa};
@@ -83,7 +97,6 @@ public class DBAdapter extends SQLiteOpenHelper {
         }
         return trasa;
     }
-
     public Cursor getAllTrasy(){
         SQLiteDatabase sql = getReadableDatabase();
         String[] kolumny = {"id","nazwa","dystans"};

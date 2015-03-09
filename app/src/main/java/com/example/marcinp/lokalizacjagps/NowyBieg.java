@@ -32,8 +32,10 @@ public class NowyBieg {
     }
 
     public void dodajWspolrzedne(Location loc){
-        Wspolrzedne temp = new Wspolrzedne(loc.getLongitude(),loc.getLatitude(),trasa.getId());
-
+        Wspolrzedne temp = new Wspolrzedne();
+        temp.setDlugosc(loc.getLongitude());
+        temp.setSzerokosc(loc.getLatitude());
+        temp.setId_Trasa(trasa.getId());
         wspolrzednesList.add(temp);
     }
 
@@ -64,6 +66,8 @@ public class NowyBieg {
         Cursor c =sql.wezWyniki(id);
         if(c.getCount()!=0)
             porazPierwszy= false;
+        else
+            porazPierwszy = true;
     }
 
 
