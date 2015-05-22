@@ -8,21 +8,16 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.marcinp.lokalizacjagps.KlasyJava.Trasa;
-import com.example.marcinp.lokalizacjagps.KlasyJava.Wspolrzedne;
+import com.example.marcinp.lokalizacjagps.BazaDanych.DBAdapter;
+import com.example.marcinp.lokalizacjagps.BazaDanych.Trasa;
+import com.example.marcinp.lokalizacjagps.BazaDanych.Wspolrzedne;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

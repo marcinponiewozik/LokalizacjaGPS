@@ -1,4 +1,4 @@
-package com.example.marcinp.lokalizacjagps.KlasyJava;
+package com.example.marcinp.lokalizacjagps.BazaDanych;
 
 /**
  * Created by MarcinP on 2015-03-03.
@@ -7,6 +7,7 @@ public class Trasa {
     int id;
     String nazwa;
     double dystans;
+    int rodzaj;
 
     public Trasa(int id, String nazwa) {
         this.id = id;
@@ -14,6 +15,14 @@ public class Trasa {
     }
 
     public Trasa() {
+    }
+
+    public int getRodzaj() {
+        return rodzaj;
+    }
+
+    public void setRodzaj(int rodzaj) {
+        this.rodzaj = rodzaj;
     }
 
     public int getId() {

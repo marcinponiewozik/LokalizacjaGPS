@@ -34,10 +34,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ActivityClass.Biegnij"/>
+        <activity android:name=".ActivityClass.Rozpocznij"/>
         <activity android:name=".ActivityClass.Trasy"/>
         <activity android:name=".ActivityClass.Wyniki"/>
         <activity android:name=".ActivityClass.TrasyMapa"/>
+        <activity android:name=".ActivityClass.Porownanie"/>
+        <activity android:name=".ActivityClass.WyznaczTrase"/>
+        <activity android:name=".ActivityClass.Miejsca"/>
+        <activity android:name=".ActivityClass.MiejscaKategorie"/>
+        <activity android:name=".ActivityClass.Kategorie"/>
+        <activity android:name=".ActivityClass.TrasaHistoria"/>
+        <activity android:name=".ActivityClass.TrasaHistoriaTab"/>
+        <activity android:name=".ActivityClass.TrasaPojazd"/>
+        <activity android:name=".ActivityClass.TrasaPieszo"/>
     </application>
 
 </manifest>

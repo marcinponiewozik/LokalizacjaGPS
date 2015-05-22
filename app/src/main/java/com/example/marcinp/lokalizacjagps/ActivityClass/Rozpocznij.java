@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -11,22 +12,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.marcinp.lokalizacjagps.DBAdapter;
-import com.example.marcinp.lokalizacjagps.KlasyJava.Trasa;
+import com.example.marcinp.lokalizacjagps.BazaDanych.DBAdapter;
+import com.example.marcinp.lokalizacjagps.BazaDanych.Trasa;
 import com.example.marcinp.lokalizacjagps.NowyBieg;
 import com.example.marcinp.lokalizacjagps.R;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,17 +38,17 @@ import java.util.TimerTask;
 /**
  * Created by MarcinP on 2015-03-04.
  */
-public class Biegnij extends Activity implements OnMapReadyCallback {
+public class Rozpocznij extends Activity implements OnMapReadyCallback {
     final Context context = this;
     private MapFragment mapFragment;
 
-    private TextView tvNazwaTrasy, tvDystans, tvTimer, tvLogi;
-
-    private Spinner spnTrasy;
+    private TextView tvNazwaTrasy, tvDystans, tvTimer;
 
     private Trasa aktualnaTrasa;
     DBAdapter sql;
 
+    Location ostatniaLokalizacja = null;
+    int odleglosc=0;
     LocationManager locationManager;
     LocationListener locationListener;
 
@@ -58,6 +59,7 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
 
     Timer timer;
     TimerTask timerTask;
+    int GPSczas,GPSodleglosc;
 
     final Handler handler = new Handler();
     @Override
@@ -66,12 +68,55 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
         setContentView(R.layout.activity_glowna);
 
         sql = new DBAdapter(context);
-        tvLogi = (TextView) findViewById(R.id.tvLog);
         listaTras = new ArrayList<String>();
         ustawGUI();
-        ustawMape();
+        pokazDialog();
+
+
     }
 
+    public void pokazDialog() {
+        ustawListe();
+
+        final Dialog dialog = new Dialog(Rozpocznij.this);
+        dialog.setContentView(R.layout.dialog_listviev);
+        dialog.setTitle("Wybierz trase");
+        ListView lv = (ListView) dialog.findViewById(R.id.lvTrasy);
+        ArrayAdapter adapter = new ArrayAdapter(Rozpocznij.this,android.R.layout.simple_list_item_activated_1,listaTras);
+        lv.setAdapter(adapter);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                aktualnaTrasa= sql.wezTrasePoNazwie(listaTras.get(position));
+                aktualizujUI();
+                dialog.cancel();
+                ustawMape();
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void rysujTrase(GoogleMap map){
+
+        Cursor c = sql.wezWSPOLRZEDNE(aktualnaTrasa.getId());
+
+        PolylineOptions options = new PolylineOptions();
+        while( c.moveToNext() ){
+            double dlugosc=c.getDouble(0);
+            double szerokosc = c.getDouble(1);
+
+            options.add(new LatLng(szerokosc,dlugosc));
+        }
+
+        Polyline polyline=map.addPolyline(options);
+        polyline.setColor(Color.BLUE);
+        polyline.setWidth(3);
+        polyline.setGeodesic(true);
+
+        if(options.getPoints().size()>1)
+            ustawKamere(options.getPoints().get(0));
+    }
     public void ustawMape() {
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -80,32 +125,30 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
         tvNazwaTrasy = (TextView) findViewById(R.id.tvNazwa);
         tvDystans = (TextView) findViewById(R.id.tvDystans);
         tvTimer = (TextView) findViewById(R.id.tvTimer);
-
         aktualnaTrasa = new Trasa();
-
-        spnTrasy = (Spinner) findViewById(R.id.spnWybierzTrase);
-
-        ustawAdapterSpinnera();
-        spnTrasy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                aktualnaTrasa = sql.wezTrasePoNazwie(listaTras.get(position));
-                aktualizujUI(aktualnaTrasa);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
     }
     public void ustawGPS() {
+        if(aktualnaTrasa.getRodzaj() == 1){
+            GPSczas = 5000;
+            GPSodleglosc = 5;
+        }
+        else {
+            GPSczas = 10000;
+            GPSodleglosc = 15;
+        }
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                if(ostatniaLokalizacja != null) {
+                odleglosc += Math.round(ostatniaLokalizacja.distanceTo(location));
+                }
+                tvDystans.setText(odleglosc+"");
                 nowy.dodajWspolrzedne(location);
-                tvLogi.setText(tvLogi.getText().toString()+location.getLatitude()+"||"+location.getLongitude()+"\n");
+
+                ostatniaLokalizacja= location;
+                ustawKamere(new LatLng(location.getLatitude(),location.getLongitude()));
             }
 
             @Override
@@ -123,22 +166,19 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
 
             }
         };
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000,5, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPSczas,GPSodleglosc, locationListener);
     }
-    public void ustawAdapterSpinnera(){
-        DBAdapter sql = new DBAdapter(context);
+    public void ustawListe(){
         Cursor c = sql.getAllTrasy();
         List<String> list = new ArrayList<String>();
         while( c.moveToNext()) {
             list.add(c.getString(1));
         }
-        ArrayAdapter adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_dropdown_item,list);
-        spnTrasy.setAdapter(adapter);
         listaTras = new ArrayList<String>();
         listaTras = list;
     }
 
-    public void aktualizujUI(Trasa aktualnaTrasa) {
+    public void aktualizujUI() {
         tvNazwaTrasy.setText(aktualnaTrasa.getNazwa());
         tvDystans.setText(""+aktualnaTrasa.getDystans());
     }
@@ -148,6 +188,8 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
+
+        rysujTrase(googleMap);
     }
 
 
@@ -185,28 +227,6 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
             }
         };
     }
-
-    public void btnDodajTrase(View v){
-        final Dialog dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dodaj_trase);
-        dialog.setTitle("Wpisz nazwe trasy");
-
-        final EditText etPodajNazwe = (EditText) dialog.findViewById(R.id.etPodajNazwe);
-        Button btnDodaj = (Button) dialog.findViewById(R.id.btnDodaj);
-        final Trasa nowa = new Trasa();
-        btnDodaj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                nowa.setDystans(0);
-                nowa.setNazwa(etPodajNazwe.getText().toString());
-                sql.dodajTrase(nowa);
-                ustawAdapterSpinnera();
-                dialog.cancel();
-            }
-        });
-
-        dialog.show();
-    }
     public void btnStart(View v){
         nowy = new NowyBieg();
         nowy.setTrasa(aktualnaTrasa);
@@ -218,8 +238,13 @@ public class Biegnij extends Activity implements OnMapReadyCallback {
     public void btnStop(View v){
         stopTimer();
 
-        nowy.zakonczBieg(czasUpdated, context);
+        nowy.zakonczBieg(czasUpdated, context,odleglosc);
 
         locationManager.removeUpdates(locationListener);
+    }
+
+    public void ustawKamere(LatLng latLang){
+        GoogleMap map = mapFragment.getMap();
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLang,5));
     }
 }

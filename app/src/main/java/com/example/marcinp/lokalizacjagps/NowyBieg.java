@@ -4,10 +4,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
 
-import com.example.marcinp.lokalizacjagps.KlasyJava.Czas;
-import com.example.marcinp.lokalizacjagps.KlasyJava.Trasa;
-import com.example.marcinp.lokalizacjagps.KlasyJava.Wspolrzedne;
-import com.example.marcinp.lokalizacjagps.KlasyJava.Wynik;
+import com.example.marcinp.lokalizacjagps.BazaDanych.DBAdapter;
+import com.example.marcinp.lokalizacjagps.BazaDanych.Trasa;
+import com.example.marcinp.lokalizacjagps.BazaDanych.Wspolrzedne;
+import com.example.marcinp.lokalizacjagps.BazaDanych.Wynik;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 public class NowyBieg {
     Trasa trasa;
     List<Wspolrzedne> wspolrzednesList;
-    boolean porazPierwszy;
+    boolean porazPierwszy = true;
 
     public NowyBieg() {
         wspolrzednesList = new ArrayList<Wspolrzedne>();
@@ -39,17 +39,19 @@ public class NowyBieg {
         wspolrzednesList.add(temp);
     }
 
-    public void zakonczBieg(Long czas,Context context){
+    public void zakonczBieg(Long czas,Context context,int odlegloscs){
 
         int sekundy = (int) (czas/1000);
         int minuty = sekundy/60;
         int godziny = minuty/60;
+        sekundy = sekundy %60;
         DBAdapter sql = new DBAdapter(context);
         sprawdzTrase(trasa.getId(),context);
         if(porazPierwszy){
             for (int i = 0; i < wspolrzednesList.size(); i++) {
                 sql.dodajWspolrzedne(wspolrzednesList.get(i));
             }
+            sql.zmienDystans(trasa.getId(),odlegloscs);
         }
 
         Wynik wynik = new Wynik();

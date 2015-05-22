@@ -5,10 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.widget.TextView;
 
-import com.example.marcinp.lokalizacjagps.DBAdapter;
-import com.example.marcinp.lokalizacjagps.KlasyJava.Trasa;
+import com.example.marcinp.lokalizacjagps.BazaDanych.DBAdapter;
+import com.example.marcinp.lokalizacjagps.BazaDanych.Trasa;
 import com.example.marcinp.lokalizacjagps.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;

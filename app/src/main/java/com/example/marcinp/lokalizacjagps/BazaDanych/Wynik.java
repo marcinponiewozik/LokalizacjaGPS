@@ -1,4 +1,4 @@
-package com.example.marcinp.lokalizacjagps.KlasyJava;
+package com.example.marcinp.lokalizacjagps.BazaDanych;
 
 /**
  * Created by MarcinP on 2015-03-03.
