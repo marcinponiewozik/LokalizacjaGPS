@@ -84,7 +84,27 @@ public class Miejsca extends Activity implements OnMapReadyCallback{
             List<Address> list= geocoder.getFromLocationName(etSzukaj.getText().toString(),1);
             if(!list.isEmpty())
                 address=list.get(0);
-            ustawKamere(new LatLng(address.getLatitude(),address.getLongitude()));
+            final LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
+            ustawKamere(latLng);
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+            alert.setTitle("Zapisac tą lokalizację?");
+            alert.setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    GoogleMap googleMap = map.getMap();
+                    dialogDodajMiejsce(latLng, googleMap);
+                }
+            });
+
+            alert.setNegativeButton("Nie",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+
+            alert.show();
         } catch (IOException e) {
             Toast.makeText(getApplicationContext(),"Problem z połączeniem", Toast.LENGTH_SHORT).show();
         } catch (IllegalArgumentException e){
@@ -123,70 +143,74 @@ public class Miejsca extends Activity implements OnMapReadyCallback{
             @Override
             public void onMapLongClick(final LatLng latLng) {
 
-                final List<Kategoria> kategoria = new ArrayList<Kategoria>();
-                List<String> kategoriaStrings = new ArrayList<String>();
-                final int[] idKategoriaSelected = new int[1];
-                Cursor c = sql.getAllKategoria();
-                while (c.moveToNext()){
-                    Kategoria k = new Kategoria();
-                    k.setId(c.getInt(0));
-                    k.setNazwa(c.getString(1));
-                    k.setZdjecie(c.getString(2));
-                    kategoria.add(k);
-                    kategoriaStrings.add(k.getNazwa());
-                }
-                final EditText etNazwaMiejsca;
-                final EditText etInformacjeDodatkowe;
-                Button btnDodaj;
-                Spinner spnKategorie;
-
-                final Dialog dialog = new Dialog(context);
-                dialog.setContentView(R.layout.dialog_miejsce);
-                dialog.setTitle("Dodaj miejsce");
-
-                etNazwaMiejsca=(EditText) dialog.findViewById(R.id.etNazwaMiejsca);
-                etInformacjeDodatkowe= (EditText) dialog.findViewById(R.id.etInformacjeDodatkowe);
-
-                spnKategorie = (Spinner) dialog.findViewById(R.id.spnKategorie);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_dropdown_item,kategoriaStrings);
-                spnKategorie.setAdapter(adapter);
-                spnKategorie.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        idKategoriaSelected[0]  = (int) kategoria.get(position).getId();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-
-                btnDodaj= (Button) dialog.findViewById(R.id.btnDodajMiejsce);
-                btnDodaj.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Miejsce m = new Miejsce();
-                        m.setNazwa(etNazwaMiejsca.getText().toString());
-                        m.setInformacjeDodatkowe(etInformacjeDodatkowe.getText().toString());
-                        m.setIdKategoria(idKategoriaSelected[0]);
-                        m.setDlugosc(latLng.longitude);
-                        m.setSzerokosc(latLng.latitude);
-
-                        sql.dodajMiejsce(m);
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.title(m.getNazwa());
-                        String snippet = sql.wezKategoria(idKategoriaSelected[0]).getNazwa();
-                        markerOptions.snippet(snippet+"/n"+m.getInformacjeDodatkowe());
-                        markerOptions.position(new LatLng(m.getSzerokosc(),m.getDlugosc()));
-                        googleMap.addMarker(markerOptions);
-                        dialog.cancel();
-                    }
-                });
-
-                dialog.show();
+                dialogDodajMiejsce(latLng, googleMap);
             }
         });
+    }
+
+    public void dialogDodajMiejsce(final LatLng latLng, final GoogleMap googleMap) {
+        final List<Kategoria> kategoria = new ArrayList<Kategoria>();
+        List<String> kategoriaStrings = new ArrayList<String>();
+        final int[] idKategoriaSelected = new int[1];
+        Cursor c = sql.getAllKategoria();
+        while (c.moveToNext()){
+            Kategoria k = new Kategoria();
+            k.setId(c.getInt(0));
+            k.setNazwa(c.getString(1));
+            k.setZdjecie(c.getString(2));
+            kategoria.add(k);
+            kategoriaStrings.add(k.getNazwa());
+        }
+        final EditText etNazwaMiejsca;
+        final EditText etInformacjeDodatkowe;
+        Button btnDodaj;
+        Spinner spnKategorie;
+
+        final Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_miejsce);
+        dialog.setTitle("Dodaj miejsce");
+
+        etNazwaMiejsca=(EditText) dialog.findViewById(R.id.etNazwaMiejsca);
+        etInformacjeDodatkowe= (EditText) dialog.findViewById(R.id.etInformacjeDodatkowe);
+
+        spnKategorie = (Spinner) dialog.findViewById(R.id.spnKategorie);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_dropdown_item,kategoriaStrings);
+        spnKategorie.setAdapter(adapter);
+        spnKategorie.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                idKategoriaSelected[0]  = (int) kategoria.get(position).getId();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        btnDodaj= (Button) dialog.findViewById(R.id.btnDodajMiejsce);
+        btnDodaj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Miejsce m = new Miejsce();
+                m.setNazwa(etNazwaMiejsca.getText().toString());
+                m.setInformacjeDodatkowe(etInformacjeDodatkowe.getText().toString());
+                m.setIdKategoria(idKategoriaSelected[0]);
+                m.setDlugosc(latLng.longitude);
+                m.setSzerokosc(latLng.latitude);
+
+                sql.dodajMiejsce(m);
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.title(m.getNazwa());
+                String snippet = sql.wezKategoria(idKategoriaSelected[0]).getNazwa();
+                markerOptions.snippet(snippet+"/n"+m.getInformacjeDodatkowe());
+                markerOptions.position(new LatLng(m.getSzerokosc(),m.getDlugosc()));
+                googleMap.addMarker(markerOptions);
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
     }
 
     public void zarzadzajMarkerami(){

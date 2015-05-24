@@ -7,7 +7,14 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Biegnij"
+        android:text="Miejsca"
+        android:id="@+id/btnWyniki"
+        android:layout_weight="1" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Monitoruj"
         android:id="@+id/btnBiegnij"
         android:layout_gravity="center_vertical"
         android:layout_weight="1" />
@@ -15,15 +22,9 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Trasy"
+        android:text="Wyznacz trasę"
         android:id="@+id/btnTrasy"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1" />
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Najlepsze wyniki"
-        android:id="@+id/btnWyniki"
-        android:layout_weight="1" />
 </LinearLayout>

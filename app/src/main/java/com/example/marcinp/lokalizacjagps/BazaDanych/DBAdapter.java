@@ -20,9 +20,29 @@ public class DBAdapter extends SQLiteOpenHelper {
                 "CREATE Table TRASA(" +
                 "id INTEGER PRIMARY KEY Autoincrement," +
                 "nazwa TEXT," +
-                "dystans INTEGER," +
-                "rodzaj INTEGER);" +
+                "dystansPrzebyty DOUBLE," +
+                "dystansWyznaczony DOUBLE," +
+                "czasPrzebyty INTEGER,"+
+                "czasWyznaczony INTEGER);" +
                 "");
+
+        db.execSQL(
+                "CREATE Table TRASAPRZEBYTA(" +
+                "id INTEGER PRIMARY KEY Autoincrement," +
+                "id_TRASA INTEGER," +
+                "szerokosc DOUBLE," +
+                "dlugosc DOUBLE," +
+                "FOREIGN KEY(id_TRASA) REFERENCES TRASA(id));" +
+                "");
+
+        db.execSQL(
+                "CREATE Table TRASAWYZNACZONA(" +
+                        "id INTEGER PRIMARY KEY Autoincrement," +
+                        "id_TRASA INTEGER," +
+                        "szerokosc DOUBLE," +
+                        "dlugosc DOUBLE," +
+                        "FOREIGN KEY(id_TRASA) REFERENCES TRASA(id));" +
+                        "");
 
         db.execSQL(
                 "CREATE Table WYNIK(" +
@@ -58,11 +78,18 @@ public class DBAdapter extends SQLiteOpenHelper {
                         "dlugosc DOUBLE," +
                         "szerokosc DOUBLE," +
                         "id_KATEGORIA INTEGER,"+
-                        "FOREIGN KEY(id_KATEGORIA) REFERENCES TRASA (id)" +
+                        "FOREIGN KEY(id_KATEGORIA) REFERENCES KATEGORIA (id) ON DELETE CASCADE" +
                         ");" +
                         "");
     }
-
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            // Enable foreign key constraints
+            db.execSQL("PRAGMA foreign_keys=ON;");
+        }
+    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
@@ -148,7 +175,7 @@ public class DBAdapter extends SQLiteOpenHelper {
 
         String[] kolumny = {"id","nazwa","info","dlugosc","szerokosc","id_KATEGORIA"};
         String[] argumenty = {""+id_KATEGORIA};
-        Cursor c = sql.query("KATEGORIA",kolumny,"id_KATEGORIA=?",argumenty,null,null,null);
+        Cursor c = sql.query("MIEJSCE",kolumny,"id_KATEGORIA=?",argumenty,null,null,null);
         return  c;
     }
     public Miejsce getMiejsceByNazwa(String nazwa){
@@ -172,8 +199,10 @@ public class DBAdapter extends SQLiteOpenHelper {
         SQLiteDatabase sql = getWritableDatabase();
         ContentValues cv= new ContentValues();
         cv.put("nazwa",trasa.getNazwa());
-        cv.put("dystans",trasa.getDystans());
-        cv.put("rodzaj", trasa.getRodzaj());
+        cv.put("dystansPrzebyty",trasa.getDystansPrzebyty());
+        cv.put("dystansWyznaczony", trasa.getDystansWyznaczony());
+        cv.put("czasPrzebyty", trasa.getCzasPrzebyty());
+        cv.put("czasWyznaczony", trasa.getCzasWyznaczony());
         sql.insert("TRASA",null,cv);
         sql.close();
     }
@@ -183,118 +212,80 @@ public class DBAdapter extends SQLiteOpenHelper {
         sql.delete("TRASA","id=?",argumenty);
         sql.close();
     }
-    public void zmienDystans(int id, int dystans){
-        SQLiteDatabase sql = getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("dystans",dystans);
-        sql.update("TRASA",cv,"id="+id,null);
-    }
     public Trasa wezTrase(int id){
         SQLiteDatabase sql = getReadableDatabase();
-        String[] kolumny = {"id","nazwa","dystans","rodzaj"};
+        String[] kolumny = {"id","nazwa","dystansPrzebyty","dystansWyznaczony","czasPrzebyty","czasWyznaczony"};
         String[] argumenty = {""+id};
         Cursor c = sql.query("TRASA",kolumny,"id=?",argumenty,null,null,null);
         Trasa trasa = new Trasa();
         while (c.moveToNext()){
             trasa.setId(c.getInt(0));
             trasa.setNazwa(c.getString(1));
-            trasa.setDystans(c.getDouble(2));
-            trasa.setRodzaj(c.getInt(3));
+            trasa.setDystansPrzebyty(c.getDouble(2));
+            trasa.setDystansWyznaczony(c.getDouble(3));
+            trasa.setCzasPrzebyty(c.getLong(4));
+            trasa.setCzasWyznaczony(c.getLong(5));
         }
         return trasa;
     }
     public Trasa wezTrasePoNazwie(String nazwa){
         SQLiteDatabase sql = getReadableDatabase();
-        String[] kolumny = {"id","nazwa","dystans", "rodzaj"};
+        String[] kolumny = {"id","nazwa","dystansPrzebyty","dystansWyznaczony","czasPrzebyty","czasWyznaczony"};
         String[] argumenty = {""+nazwa};
         Cursor c = sql.query("TRASA",kolumny,"nazwa=?",argumenty,null,null,null);
         Trasa trasa = new Trasa();
         while (c.moveToNext()){
             trasa.setId(c.getInt(0));
             trasa.setNazwa(c.getString(1));
-            trasa.setDystans(c.getDouble(2));
-            trasa.setRodzaj(c.getInt(3));
+            trasa.setDystansPrzebyty(c.getDouble(2));
+            trasa.setDystansWyznaczony(c.getDouble(3));
+            trasa.setCzasPrzebyty(c.getLong(4));
+            trasa.setCzasWyznaczony(c.getLong(5));
         }
         return trasa;
     }
     public Cursor getAllTrasy(){
         SQLiteDatabase sql = getReadableDatabase();
 
-        String[] kolumny = {"id","nazwa","dystans","rodzaj"};
+        String[] kolumny = {"id","nazwa","dystansPrzebyty","dystansWyznaczony","czasPrzebyty","czasWyznaczony"};
         Cursor c = sql.query("TRASA",kolumny,null,null,null,null,null);
         return  c;
     }
-    //Wyniki
-    public void dodajWynik(Wynik wynik){
+    //TrasaPrzebyta
+    public void dodajTrasaPrzebyta(TrasaPrzebyta trasa){
         SQLiteDatabase sql = getWritableDatabase();
         ContentValues cv= new ContentValues();
-        cv.put("id_Trasa",wynik.getId_Trasa());
-        cv.put("godziny",wynik.getGodziny());
-        cv.put("minuty",wynik.getMinuty());
-        cv.put("sekundy",wynik.getSekundy());
-        sql.insert("WYNIK", null, cv);
+        cv.put("id_TRASA",trasa.getIdTrasa());
+        cv.put("szerokosc",trasa.getSzerokosc());
+        cv.put("dlugosc",trasa.getDlugosc());
+
+        sql.insert("TRASAPRZEBYTA",null,cv);
         sql.close();
     }
-    public void usunWynik(int id){
-        SQLiteDatabase sql = getWritableDatabase();
-        String[] argumenty = {""+id};
-        sql.delete("WYNIK","id=?",argumenty);
-        sql.close();
-    }
-    public Cursor wezWyniki(int id){
+    public Cursor trasaPrzebytaByIdTrasa(int id){
         SQLiteDatabase sql = getReadableDatabase();
-        String[] kolumny = {"id","id_TRASA","godziny","minuty","sekundy"};
+        String[] kolumny = {"id","szerokosc","dlugosc"};
         String[] argumenty = {""+id};
-        Cursor c = sql.query("WYNIK",kolumny,"id_TRASA=?",argumenty,null,null,null);
+        Cursor c = sql.query("TRASAPRZEBYTA",kolumny,"id_TRASA=?",argumenty,null,null,null);
         return c;
     }
-    public int najlepszyWynik(int id){
-        SQLiteDatabase sql = getReadableDatabase();
-        String[] kolumny = {"id","id_TRASA","godziny","minuty","sekundy"};
-        String[] argumenty = {""+id};
-        Cursor c = sql.query("WYNIK",kolumny,"id_TRASA=?",argumenty,null,null,null);
-        int index = 0;
-        c.moveToNext();
-        int wynik = c.getInt(2)+c.getInt(3)+c.getInt(4);
 
-        while (c.moveToNext()){
-            int wynikTemp= c.getInt(2)+c.getInt(3)+c.getInt(4);
-            if (wynik>wynikTemp) {
-                wynik = wynikTemp;
-                index = c.getPosition();
-            }
-        }
-        return index;
-    }
-    public int liczbaWynikow(int id){
-        SQLiteDatabase sql= getReadableDatabase();
-        String[] kolumny = {"id","id_TRASA"};
-        String[] argumenty = {""+id};
-        Cursor c = sql.query("WYNIK",kolumny,"id_TRASA=?",argumenty,null,null,null);
-
-        return c.getCount();
-    }
-    //Wspolrzedne
-    public void dodajWspolrzedne(Wspolrzedne wsp){
+    //TrasaWyznaczona
+    public void dodajTrasaWyznaczona(TrasaWyznaczona trasa){
         SQLiteDatabase sql = getWritableDatabase();
         ContentValues cv= new ContentValues();
-        cv.put("id_Trasa",wsp.getId_Trasa());
-        cv.put("dlugosc",wsp.getDlugosc());
-        cv.put("szerokosc",wsp.getSzerokosc());
-        sql.insert("WSPOLRZEDNE",null,cv);
+        cv.put("id_TRASA",trasa.getIdTrasa());
+        cv.put("szerokosc",trasa.getSzerokosc());
+        cv.put("dlugosc",trasa.getDlugosc());
+
+        sql.insert("TRASAWYZNACZONA",null,cv);
         sql.close();
     }
-    public void usunWspolrzedne(int id){
-        SQLiteDatabase sql = getWritableDatabase();
-        String[] argumenty = {""+id};
-        sql.delete("WSPOLRZEDNE","id=?",argumenty);
-        sql.close();
-    }
-    public Cursor wezWSPOLRZEDNE(int id){
+    public Cursor trasaWyznaczonaByIdTrasa(int id){
         SQLiteDatabase sql = getReadableDatabase();
-        String[] kolumny = {"dlugosc","szerokosc"};
+        String[] kolumny = {"id","szerokosc","dlugosc"};
         String[] argumenty = {""+id};
-        Cursor c = sql.query("WSPOLRZEDNE",kolumny,"id_TRASA=?",argumenty,null,null,null);
+        Cursor c = sql.query("TRASAWYZNACZONA",kolumny,"id_TRASA=?",argumenty,null,null,null);
         return c;
     }
 

@@ -5,9 +5,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -62,6 +65,7 @@ public class Kategorie extends Activity {
                     kategoria.setZdjecie(null);
 
                     sql.dodajKategoria(kategoria);
+                    initListViewAdapter();
                     dialog.cancel();
                 }
             }
@@ -70,8 +74,45 @@ public class Kategorie extends Activity {
         dialog.show();
     }
     public void initView() {
-        listaKategorii = new ArrayList<>();
         lvKategorie = (ListView) findViewById(R.id.lvKategorie);
+        initListViewAdapter();
+
+        lvKategorie.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(context,KategorieMapa.class);
+                intent.putExtra("id_KATEGORIA",listaKategorii.get(i).getId());
+                startActivity(intent);
+            }
+        });
+
+        lvKategorie.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int index, long l) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                alert.setTitle("Usunąć kategorię?");
+                alert.setPositiveButton("Tak",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        sql.usunKategoria(listaKategorii.get(index).getId());
+                        initListViewAdapter();
+                    }
+                });
+                alert.setNegativeButton("Nie",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                alert.show();
+                return false;
+            }
+        });
+    }
+
+    public void initListViewAdapter() {
+        listaKategorii = new ArrayList<>();
         itemList= new ArrayList<>();
         Cursor c=sql.getAllKategoria();
         while( c.moveToNext()){
@@ -82,14 +123,17 @@ public class Kategorie extends Activity {
 
             Item i = new Item();
             i.setNazwa(temp.getNazwa());
-            i.setLiczbaMiejsc("0");
+
+            int liczbaMiejsc = sql.getAllMiejsceByKategoria(temp.getId()).getCount();
+            System.out.println("PPPPP:"+liczbaMiejsc);
+            i.setLiczbaMiejsc(String.valueOf(liczbaMiejsc));
             i.setZdjecie(null);
             itemList.add(i);
             listaKategorii.add(temp);
         }
         Item[] tempList = new Item[itemList.size()];
         tempList = itemList.toArray(tempList);
-        ListViewAdapter adapter = new ListViewAdapter(context,R.layout.row_list,tempList);
+        ListViewAdapter adapter = new ListViewAdapter(context, R.layout.row_list,tempList);
 
         lvKategorie.setAdapter(adapter);
     }

@@ -6,9 +6,11 @@ package com.example.marcinp.lokalizacjagps.BazaDanych;
 public class Trasa {
     int id;
     String nazwa;
-    double dystans;
-    int rodzaj;
+    double dystansWyznaczony;
+    double dystansPrzebyty;
 
+    long czasPrzebyty;
+    long czasWyznaczony;
     public Trasa(int id, String nazwa) {
         this.id = id;
         this.nazwa = nazwa;
@@ -17,12 +19,20 @@ public class Trasa {
     public Trasa() {
     }
 
-    public int getRodzaj() {
-        return rodzaj;
+    public long getCzasPrzebyty() {
+        return czasPrzebyty;
     }
 
-    public void setRodzaj(int rodzaj) {
-        this.rodzaj = rodzaj;
+    public void setCzasPrzebyty(long czasPrzebyty) {
+        this.czasPrzebyty = czasPrzebyty;
+    }
+
+    public long getCzasWyznaczony() {
+        return czasWyznaczony;
+    }
+
+    public void setCzasWyznaczony(long czasWyznaczony) {
+        this.czasWyznaczony = czasWyznaczony;
     }
 
     public int getId() {
@@ -41,11 +51,19 @@ public class Trasa {
         this.nazwa = nazwa;
     }
 
-    public double getDystans() {
-        return dystans;
+    public double getDystansWyznaczony() {
+        return dystansWyznaczony;
     }
 
-    public void setDystans(double dystans) {
-        this.dystans = dystans;
+    public void setDystansWyznaczony(double dystansWyznaczony) {
+        this.dystansWyznaczony = dystansWyznaczony;
+    }
+
+    public double getDystansPrzebyty() {
+        return dystansPrzebyty;
+    }
+
+    public void setDystansPrzebyty(double dystansPrzebyty) {
+        this.dystansPrzebyty = dystansPrzebyty;
     }
 }

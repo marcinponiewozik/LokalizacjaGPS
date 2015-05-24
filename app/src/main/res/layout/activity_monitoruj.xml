@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Switch
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:text="Monitorowanie"
+        android:id="@+id/switchwlwyl"
+        android:layout_gravity="center_horizontal"
+        android:checked="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Wybierz tryb poruszania się"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal" />
+
+    <RadioGroup
+        android:layout_width="fill_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/rgTryb">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pieszo"
+            android:id="@+id/rbPieszo"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pojazd"
+            android:id="@+id/rbPojazd"
+            android:layout_gravity="right"
+            android:checked="false" />
+    </RadioGroup>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lvMiejsca"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/btnSzukaj"
             android:layout_toStartOf="@+id/btnSzukaj"
-            android:hint="Enter search key" />
+            android:hint="Wpisz adres" />
 
         <ImageButton
             android:id="@+id/btnSzukaj"
